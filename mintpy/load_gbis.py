@@ -134,7 +134,7 @@ def gbis_mat2hdf5(inv_mat_file, display=True):
         if display:
             dlim = np.nanmax(np.abs(data))
             for ax, d in zip(axs[i, :], [data, model, residual]):
-                im = ax.imshow(d, vmin=-dlim, vmax=dlim, cmap='jet')
+                im = ax.imshow(d, vmin=-dlim, vmax=dlim, cmap='cmy')
                 fig.colorbar(im, ax=ax)
             axs[i,0].set_ylabel('\n'.join(insarPlot.name.split('_', 1)))
 

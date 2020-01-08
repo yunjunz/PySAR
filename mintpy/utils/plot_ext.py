@@ -108,7 +108,7 @@ def get_poly_mask(fname, datasetName, print_msg=True):
     #    vmin = np.nanmin(data)
     ## plot
     #fig, ax = plt.subplots()
-    #im = ax.imshow(data, cmap='jet', vmin=vmin, vmax=vmax)
+    #im = ax.imshow(data, cmap='cmy', vmin=vmin, vmax=vmax)
     #fig.colorbar(im)
 
     selector = SelectFromCollection(ax, im)

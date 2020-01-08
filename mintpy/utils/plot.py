@@ -164,12 +164,11 @@ def add_figure_argument(parser):
 
     # colormap
     fig.add_argument('-c', '--colormap', dest='colormap',
-                     help='colormap used for display, i.e. jet, cmy, RdBu, hsv, jet_r, temperature, viridis, etc.\n'
-                          'More details: https://mintpy.readthedocs.io/en/latest/resources/colormaps/')
-    fig.add_argument('--cm-lut','--cmap-lut', dest='cmap_lut', type=int, default=256, metavar='NUM',
-                     help='number of increment of colormap lookup table (default: %(default)s).')
-    fig.add_argument('--cm-vlist','--cmap-vlist', dest='cmap_vlist', type=float, nargs=3, default=[0.0, 0.7, 1.0],
-                     help='list of 3 float numbers, for truncated colormap only (default: %(default)s).')
+                     help='colormap used for display, i.e. cmy, RdBu, RdBu_r, jet, hsv, temperature, viridis,  etc.\n'
+                          'colormaps in Matplotlib - http://matplotlib.org/users/colormaps.html\n'
+                          'colormaps in GMT - http://soliton.vm.bytemark.co.uk/pub/cpt-city/')
+    fig.add_argument('--cm-lut', dest='cmap_lut', type=int, default=256, metavar='NUM',
+                     help='number of increment of colormap lookup table')
 
     # colorbar
     fig.add_argument('--nocbar', '--nocolorbar', dest='disp_cbar',
@@ -584,16 +583,48 @@ def auto_shared_lalo_location(axs, loc=(1,0,0,1), flatten=False):
     return locs
 
 
-def check_colormap_input(metadata, cmap_name=None, datasetName=None, cmap_lut=256,
-                         cmap_vlist=[0.0, 0.7, 1.0], print_msg=True):
-    gray_dataset_key_words = ['coherence', 'temporal_coherence',
-                              '.cor', '.mli', '.slc', '.amp', '.ramp']
+def check_colormap_input(metadata, cmap_name=None, datasetName=None, cmap_lut=256, print_msg=True):
+    gray_dataset_keywords = ['coherence',
+                             'temporalCoherence',
+                             'waterMask',
+                             'shadowMask',
+                             'magnitude',
+                             'intensity',
+                             'cor',
+                             'mli',
+                             'slc',
+                             'amp',
+                             'ramp']
+
+    dis_dataset_keywords = ['timeseries',
+                            'displacement',
+                            'unwrapPhase',
+                            'wrapPhase',
+                            'iono',
+                            'rangeOffset',
+                            'azimuthOffset',
+                            'velocity',
+                            'velocityStd',
+                            'giantTimeseries',
+                            'recons',
+                            'rawts',
+                            'unw',
+                            'int',
+                            'flat']
+
     if not cmap_name:
-        if any(i in gray_dataset_key_words for i in [metadata['FILE_TYPE'],
-                                                     str(datasetName).split('-')[0]]):
+        # get keyword of input dataset
+        k = metadata['FILE_TYPE'].split('-')[0].split('_')[0].replace('.','')
+        if datasetName:
+            k = datasetName.split('-')[0].split('_')[0].replace('.','')
+
+        # find corresponding colormap
+        if k in gray_dataset_keywords:
             cmap_name = 'gray'
+        elif k in dis_dataset_keywords:
+            cmap_name = 'cmy'
         else:
-            cmap_name = 'jet'
+            cmap_name = 'viridis'
     if print_msg:
         print('colormap:', cmap_name)
 
@@ -1017,18 +1048,18 @@ def plot_coherence_matrix(ax, date12List, cohList, date12List_drop=[], p_dict={}
                 im : mappable
     """
     # Figure Setting
-    if 'fontsize'    not in p_dict.keys():   p_dict['fontsize']    = 12
-    if 'linewidth'   not in p_dict.keys():   p_dict['linewidth']   = 2
-    if 'markercolor' not in p_dict.keys():   p_dict['markercolor'] = 'orange'
-    if 'markersize'  not in p_dict.keys():   p_dict['markersize']  = 16
-    if 'disp_title'  not in p_dict.keys():   p_dict['disp_title']  = True
-    if 'fig_title'   not in p_dict.keys():   p_dict['fig_title']   = 'Coherence Matrix'
-    if 'colormap'    not in p_dict.keys():   p_dict['colormap']    = 'jet'
-    if 'cbar_label'  not in p_dict.keys():   p_dict['cbar_label']  = 'Coherence'
-    if 'vlim'        not in p_dict.keys():   p_dict['vlim']        = (0.2, 1.0)
-    if 'disp_cbar'   not in p_dict.keys():   p_dict['disp_cbar']   = True
-    if 'legend_loc'  not in p_dict.keys():   p_dict['legend_loc']  = 'best'
-    if 'disp_legend' not in p_dict.keys():   p_dict['disp_legend'] = True
+    if 'fontsize'    not in plot_dict.keys():   plot_dict['fontsize']    = 12
+    if 'linewidth'   not in plot_dict.keys():   plot_dict['linewidth']   = 2
+    if 'markercolor' not in plot_dict.keys():   plot_dict['markercolor'] = 'orange'
+    if 'markersize'  not in plot_dict.keys():   plot_dict['markersize']  = 16
+    if 'disp_title'  not in plot_dict.keys():   plot_dict['disp_title']  = True
+    if 'fig_title'   not in plot_dict.keys():   plot_dict['fig_title']   = 'Coherence Matrix'
+    if 'colormap'    not in plot_dict.keys():   plot_dict['colormap']    = 'RdBu'
+    if 'cbar_label'  not in plot_dict.keys():   plot_dict['cbar_label']  = 'Coherence'
+    if 'ylim'        not in plot_dict.keys():   plot_dict['ylim']        = (0., 1.)
+    if 'disp_cbar'   not in plot_dict.keys():   plot_dict['disp_cbar']   = True
+    if 'legend_loc'  not in plot_dict.keys():   plot_dict['legend_loc']  = 'best'
+    if 'disp_legend' not in plot_dict.keys():   plot_dict['disp_legend'] = True
 
     # support input colormap: string for colormap name, or colormap object directly
     if isinstance(p_dict['colormap'], str):
@@ -1712,7 +1743,7 @@ def read_mask(fname, mask_file=None, datasetName=None, box=None, print_msg=True)
         except:
             mask_file = None
             if print_msg:
-                print('Can not open mask file:', mask_file)        
+                print('Can not open mask file:', mask_file)
 
     elif k in ['HDFEOS']:
         if datasetName.split('-')[0] in timeseriesDatasetNames:

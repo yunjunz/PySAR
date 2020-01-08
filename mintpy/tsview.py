@@ -122,7 +122,7 @@ def cmd_line_parse(iargs=None):
     if not inps.disp_unit:
         inps.disp_unit = 'cm'
     if not inps.colormap:
-        inps.colormap = 'jet'
+        inps.colormap = 'cmy'
     if not inps.fig_size:
         inps.fig_size = [8.0, 4.5]
 

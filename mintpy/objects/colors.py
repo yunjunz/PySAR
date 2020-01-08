@@ -53,12 +53,12 @@ class ColormapExt(ScalarMappable):
         cmap = ColormapExt('RdBu_truncate', vlist=[0.2, 0.4, 1.0]).colormap
 
         # repeat   colormap by adding suffix "_{}".format(int)
-        cmap = ColormapExt('jet_5').colormap
+        cmap = ColormapExt('RdBu_5').colormap
 
         ## combined derivative names has to follow the order: _r, _truncate and _{int}:
         i.e. 'RdBu_r_truncate'
              'RdBu_truncate_3'
-             'jet_r_5'
+             'vik_r_5'
     """
 
     def __init__(self, cmap_name, cmap_lut=256, vlist=[0.0, 0.7, 1.0], cpt_dir=None):
@@ -219,6 +219,9 @@ class ColormapExt(ScalarMappable):
             rgbs[255,1] = 255
             rgbs[255,2] = 255
             
+            rgbs = np.roll(rgbs, int(256/2-214), axis=0)  #shift green to the center
+            rgbs = np.flipud(rgbs)   #flip up-down so that orange is in the later half (positive)
+
             rgbs = np.roll(rgbs, int(256/2-214), axis=0)  #shift green to the center
             rgbs = np.flipud(rgbs)   #flip up-down so that orange is in the later half (positive)
 
