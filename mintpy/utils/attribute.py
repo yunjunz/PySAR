@@ -103,12 +103,11 @@ def update_attribute4geo2radar(atr_in, shape2d=None, res_obj=None, print_msg=Tru
     atr['WIDTH'] = shape2d[1]
 
     # remove geo-coord related metadata
-    for i in ['Y_FIRST', 'X_FIRST', 'Y_STEP', 'X_STEP', 'Y_UNIT', 'X_UNIT',
-              'REF_Y', 'REF_X', 'REF_LAT', 'REF_LON']:
-        try:
-            atr.pop(i)
-        except:
-            pass
+    for key in ['Y_FIRST', 'X_FIRST', 'Y_STEP', 'X_STEP', 'Y_UNIT', 'X_UNIT',
+                'REF_Y', 'REF_X', 'REF_LAT', 'REF_LON']:
+        if key in atr.keys():
+            atr.pop(key)
+
     return atr
 
 

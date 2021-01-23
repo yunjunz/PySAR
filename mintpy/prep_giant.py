@@ -109,10 +109,8 @@ def prepare_metadata4giant(fname, meta_files=None):
         print('reading {}'.format(rsc_file))
         rsc_dict = readfile.read_roipac_rsc(rsc_file)
         for key in ['length', 'LENGTH', 'FILE_LENGTH', 'width', 'WIDTH']:
-            try:
+            if key in rsc_dict.keys():
                 rsc_dict.pop(key)
-            except:
-                pass
         xml_dict.update(rsc_dict)
     for xml_file in xml_files:
         print('reading {}'.format(xml_file))
